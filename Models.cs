@@ -2,31 +2,52 @@ using System.Text.Json.Serialization;
 
 namespace ApisLabs.Functions;
 
-public class Pet
+public class Book
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
+    [JsonPropertyName("isbn")]
+    public string Isbn { get; set; } = string.Empty;
 
-    [JsonPropertyName("species")]
-    public string Species { get; set; } = string.Empty;
+    [JsonPropertyName("title")]
+    public string Title { get; set; } = string.Empty;
 
-    [JsonPropertyName("breed")]
-    public string? Breed { get; set; }
+    [JsonPropertyName("author")]
+    public AuthorInfo Author { get; set; } = new();
 
-    [JsonPropertyName("age")]
-    public int? Age { get; set; }
+    [JsonPropertyName("categories")]
+    public List<string> Categories { get; set; } = new();
 
-    [JsonPropertyName("color")]
-    public string? Color { get; set; }
+    [JsonPropertyName("publicationYear")]
+    public int PublicationYear { get; set; }
 
-    [JsonPropertyName("weight")]
-    public double? Weight { get; set; }
+    [JsonPropertyName("language")]
+    public string Language { get; set; } = string.Empty;
 
-    [JsonPropertyName("status")]
-    public string Status { get; set; } = "available";
+    [JsonPropertyName("pages")]
+    public int? Pages { get; set; }
+
+    [JsonPropertyName("publisher")]
+    public string? Publisher { get; set; }
+
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+
+    [JsonPropertyName("coverImage")]
+    public string? CoverImage { get; set; }
+
+    [JsonPropertyName("available")]
+    public bool Available { get; set; } = true;
+
+    [JsonPropertyName("rating")]
+    public double? Rating { get; set; }
+
+    [JsonPropertyName("reviewCount")]
+    public int ReviewCount { get; set; }
+
+    [JsonPropertyName("price")]
+    public PriceInfo? Price { get; set; }
 
     [JsonPropertyName("createdAt")]
     public DateTime CreatedAt { get; set; }
@@ -35,26 +56,65 @@ public class Pet
     public DateTime UpdatedAt { get; set; }
 }
 
-public class PetInput
+public class AuthorInfo
 {
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
+}
 
-    [JsonPropertyName("species")]
-    public string Species { get; set; } = string.Empty;
+public class PriceInfo
+{
+    [JsonPropertyName("amount")]
+    public double? Amount { get; set; }
 
-    [JsonPropertyName("breed")]
-    public string? Breed { get; set; }
+    [JsonPropertyName("currency")]
+    public string? Currency { get; set; }
+}
 
-    [JsonPropertyName("age")]
-    public int? Age { get; set; }
+public class BookInput
+{
+    [JsonPropertyName("isbn")]
+    public string? Isbn { get; set; }
 
-    [JsonPropertyName("color")]
-    public string? Color { get; set; }
+    [JsonPropertyName("title")]
+    public string? Title { get; set; }
 
-    [JsonPropertyName("weight")]
-    public double? Weight { get; set; }
+    [JsonPropertyName("author")]
+    public AuthorInfo? Author { get; set; }
 
-    [JsonPropertyName("status")]
-    public string? Status { get; set; }
+    [JsonPropertyName("categories")]
+    public List<string>? Categories { get; set; }
+
+    [JsonPropertyName("publicationYear")]
+    public int? PublicationYear { get; set; }
+
+    [JsonPropertyName("language")]
+    public string? Language { get; set; }
+
+    [JsonPropertyName("pages")]
+    public int? Pages { get; set; }
+
+    [JsonPropertyName("publisher")]
+    public string? Publisher { get; set; }
+
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+
+    [JsonPropertyName("coverImage")]
+    public string? CoverImage { get; set; }
+
+    [JsonPropertyName("available")]
+    public bool? Available { get; set; }
+
+    [JsonPropertyName("rating")]
+    public double? Rating { get; set; }
+
+    [JsonPropertyName("reviewCount")]
+    public int? ReviewCount { get; set; }
+
+    [JsonPropertyName("price")]
+    public PriceInfo? Price { get; set; }
 }

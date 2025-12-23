@@ -17,10 +17,10 @@ public class CosmosDbService
         _container = cosmosClient.GetContainer(databaseName, containerName);
     }
 
-    public async Task<IEnumerable<Pet>> GetPetsAsync()
+    public async Task<IEnumerable<Book>> GetBooksAsync()
     {
-        var query = _container.GetItemQueryIterator<Pet>();
-        var results = new List<Pet>();
+        var query = _container.GetItemQueryIterator<Book>();
+        var results = new List<Book>();
 
         while (query.HasMoreResults)
         {
@@ -31,11 +31,11 @@ public class CosmosDbService
         return results;
     }
 
-    public async Task<Pet?> GetPetByIdAsync(string id)
+    public async Task<Book?> GetBookByIdAsync(string id)
     {
         try
         {
-            var response = await _container.ReadItemAsync<Pet>(id, new PartitionKey(id));
+            var response = await _container.ReadItemAsync<Book>(id, new PartitionKey(id));
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -44,20 +44,20 @@ public class CosmosDbService
         }
     }
 
-    public async Task<Pet> CreatePetAsync(Pet pet)
+    public async Task<Book> CreateBookAsync(Book book)
     {
-        var response = await _container.CreateItemAsync(pet, new PartitionKey(pet.Id));
+        var response = await _container.CreateItemAsync(book, new PartitionKey(book.Id));
         return response.Resource;
     }
 
-    public async Task<Pet> UpdatePetAsync(Pet pet)
+    public async Task<Book> UpdateBookAsync(Book book)
     {
-        var response = await _container.UpsertItemAsync(pet, new PartitionKey(pet.Id));
+        var response = await _container.UpsertItemAsync(book, new PartitionKey(book.Id));
         return response.Resource;
     }
 
-    public async Task DeletePetAsync(string id)
+    public async Task DeleteBookAsync(string id)
     {
-        await _container.DeleteItemAsync<Pet>(id, new PartitionKey(id));
+        await _container.DeleteItemAsync<Book>(id, new PartitionKey(id));
     }
 }
