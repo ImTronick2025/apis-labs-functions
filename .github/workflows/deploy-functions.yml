@@ -5,9 +5,22 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Config file to use (dev/qa/uat/prod)"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - uat
+          - prod
 
 env:
   DOTNET_VERSION: "8.0.x"
+  DEFAULT_ENVIRONMENT: dev
+  ENVIRONMENT_OVERRIDE: ${{ github.event.inputs.environment }}
   FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
   FUNCTION_APP_RESOURCE_GROUP: ${{ secrets.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}
   FUNCTION_APP_NAME_VAR: ${{ vars.AZURE_FUNCTIONAPP_NAME }}
@@ -25,13 +38,29 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Load environment config
+        id: envfile
+        run: |
+          ENV_NAME="${ENVIRONMENT_OVERRIDE:-$DEFAULT_ENVIRONMENT}"
+          FILE="configs/functions.${ENV_NAME}.env"
+          if [ ! -f "$FILE" ]; then
+            echo "Missing environment file: $FILE" >&2
+            exit 1
+          fi
+          set -a
+          . "$FILE"
+          set +a
+          echo "FUNCTION_APP_NAME=$FUNCTION_APP_NAME" >> $GITHUB_ENV
+          echo "FUNCTION_APP_RESOURCE_GROUP=$FUNCTION_APP_RESOURCE_GROUP" >> $GITHUB_ENV
+          echo "env_name=$ENV_NAME" >> $GITHUB_OUTPUT
+
       - name: Resolve deploy target
         id: target
         run: |
           APP_NAME="${FUNCTION_APP_NAME:-$FUNCTION_APP_NAME_VAR}"
           RG="${FUNCTION_APP_RESOURCE_GROUP:-$FUNCTION_APP_RESOURCE_GROUP_VAR}"
           if [ -z "$APP_NAME" ] || [ -z "$RG" ]; then
-            echo "Missing function app name/resource group. Set AZURE_FUNCTIONAPP_NAME and AZURE_FUNCTIONAPP_RESOURCE_GROUP as secrets or vars." >&2
+            echo "Missing function app name/resource group. Set in configs/functions.${ENVIRONMENT_OVERRIDE:-$DEFAULT_ENVIRONMENT}.env or as secrets/vars." >&2
             exit 1
           fi
           echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
