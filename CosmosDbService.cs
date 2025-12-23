@@ -13,7 +13,13 @@ public class CosmosDbService
         var databaseName = configuration["CosmosDbDatabaseName"];
         var containerName = configuration["CosmosDbContainerName"];
 
-        var cosmosClient = new CosmosClient(connectionString);
+        var cosmosClient = new CosmosClient(connectionString, new CosmosClientOptions
+        {
+            SerializerOptions = new CosmosSerializationOptions
+            {
+                PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+            }
+        });
         _container = cosmosClient.GetContainer(databaseName, containerName);
     }
 
