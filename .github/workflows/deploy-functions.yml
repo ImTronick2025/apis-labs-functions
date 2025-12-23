@@ -10,6 +10,8 @@ env:
   DOTNET_VERSION: "8.0.x"
   FUNCTION_APP_NAME: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
   FUNCTION_APP_RESOURCE_GROUP: ${{ secrets.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}
+  FUNCTION_APP_NAME_VAR: ${{ vars.AZURE_FUNCTIONAPP_NAME }}
+  FUNCTION_APP_RESOURCE_GROUP_VAR: ${{ vars.AZURE_FUNCTIONAPP_RESOURCE_GROUP }}
 
 jobs:
   build-and-deploy:
@@ -22,6 +24,18 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Resolve deploy target
+        id: target
+        run: |
+          APP_NAME="${FUNCTION_APP_NAME:-$FUNCTION_APP_NAME_VAR}"
+          RG="${FUNCTION_APP_RESOURCE_GROUP:-$FUNCTION_APP_RESOURCE_GROUP_VAR}"
+          if [ -z "$APP_NAME" ] || [ -z "$RG" ]; then
+            echo "Missing function app name/resource group. Set AZURE_FUNCTIONAPP_NAME and AZURE_FUNCTIONAPP_RESOURCE_GROUP as secrets or vars." >&2
+            exit 1
+          fi
+          echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
+          echo "resource_group=$RG" >> $GITHUB_OUTPUT
 
       - name: Restore
         run: dotnet restore
@@ -45,6 +59,6 @@ jobs:
       - name: Deploy to Azure Functions
         run: |
           az functionapp deployment source config-zip \
-            --name "$FUNCTION_APP_NAME" \
-            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --name "${{ steps.target.outputs.app_name }}" \
+            --resource-group "${{ steps.target.outputs.resource_group }}" \
             --src functionapp.zip
